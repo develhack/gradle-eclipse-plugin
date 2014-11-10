@@ -11,7 +11,7 @@ apply plugin: 'maven-publish'
 
 group = 'com.develhack'
 archivesBaseName = 'gradle-eclupse-plugin'
-version = '0.1'
+version = '0.1.1'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -42,11 +42,8 @@ artifacts {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			if (plugins.hasPlugin('war')) {
-				from components.web
-			} else {
-				from components.java
-			}
+
+			from components.java
 
 			artifact sourcesJar { classifier "sources" }
 
@@ -55,15 +52,16 @@ publishing {
 	}
 }
 
-if(hasProperty('bintrayKey')) {
+if(hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
 
 	apply plugin: 'com.jfrog.bintray'
 
 	bintray {
-		user = 'develhack'
+		user = bintrayUser
 		key = bintrayKey
 		publications = ['mavenJava']
 		pkg {
+			userOrg = 'develhack'
 			repo = 'maven'
 			name = 'gradle-eclipse-plugin'
 		}
