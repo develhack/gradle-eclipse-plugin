@@ -1,0 +1,71 @@
+defaultTasks 'clean', 'build'
+
+buildscript {
+	repositories { jcenter() }
+	dependencies { classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6' }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+group = 'com.develhack'
+archivesBaseName = 'gradle-eclupse-plugin'
+version = '0.1'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+repositories { jcenter() }
+
+dependencies {
+	compile     gradleApi()
+	compile     localGroovy()
+}
+
+task javadocJar(type: Jar, dependsOn: groovydoc) {
+	classifier = 'javadoc'
+	from "${buildDir}/javadoc"
+}
+
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allSource
+	classifier = 'sources'
+}
+
+artifacts {
+	archives jar
+	archives javadocJar
+	archives sourcesJar
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			if (plugins.hasPlugin('war')) {
+				from components.web
+			} else {
+				from components.java
+			}
+
+			artifact sourcesJar { classifier "sources" }
+
+			artifact javadocJar { classifier "javadoc" }
+		}
+	}
+}
+
+if(hasProperty('bintrayKey')) {
+
+	apply plugin: 'com.jfrog.bintray'
+
+	bintray {
+		user = 'develhack'
+		key = bintrayKey
+		publications = ['mavenJava']
+		pkg {
+			repo = 'maven'
+			name = 'gradle-eclipse-plugin'
+		}
+	}
+}
