@@ -13,6 +13,10 @@ class EclipsePlugin implements Plugin<Project> {
 
 		project.apply plugin: 'eclipse'
 
+		if(!project.plugins.hasPlugin('java')) {
+			return;
+		}
+
 		project.eclipse {
 			classpath {
 				file {
