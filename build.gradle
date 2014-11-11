@@ -64,9 +64,9 @@ if(hasProperty('BINTRAY_USER') && hasProperty('BINTRAY_API_KEY')) {
 			userOrg = 'develhack'
 			repo = 'maven'
 			name = 'gradle-eclipse-plugin'
-		}
-		version {
-			attributes = ['gradle-plugin': 'com.develhack.eclipse:com.develhack:gradle-eclipse-plugin' ]
+			version {
+				attributes = ['gradle-plugin': 'com.develhack.eclipse:com.develhack:gradle-eclipse-plugin' ]
+			}
 		}
 	}
 }
