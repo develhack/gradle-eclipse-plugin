@@ -65,5 +65,8 @@ if(hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
 			repo = 'maven'
 			name = 'gradle-eclipse-plugin'
 		}
+		version {
+			attributes = ['gradle-plugin': 'com.develhack.gradle-eclipse-plugin:com.develhack:gradle-eclipse-plugin' ]
+		}
 	}
 }
