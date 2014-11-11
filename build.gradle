@@ -52,7 +52,7 @@ publishing {
 	}
 }
 
-if(hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
+if(hasProperty('BINTRAY_USER') && hasProperty('BINTRAY_API_KEY')) {
 
 	apply plugin: 'com.jfrog.bintray'
 
