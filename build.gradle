@@ -66,7 +66,7 @@ if(hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
 			name = 'gradle-eclipse-plugin'
 		}
 		version {
-			attributes = ['gradle-plugin': 'com.develhack.gradle-eclipse-plugin:com.develhack:gradle-eclipse-plugin' ]
+			attributes = ['gradle-plugin': 'com.develhack.eclipse:com.develhack:gradle-eclipse-plugin' ]
 		}
 	}
 }
