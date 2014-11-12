@@ -3,6 +3,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.AbstractCompile
 
+import com.esotericsoftware.minlog.Log.Logger;
+
 class EclipsePlugin implements Plugin<Project> {
 
 	private Project project;
@@ -11,58 +13,69 @@ class EclipsePlugin implements Plugin<Project> {
 
 		this.project = project;
 
-		project.apply plugin: 'eclipse'
+		project.afterEvaluate {
 
-		if(!project.plugins.hasPlugin('java')) {
-			return;
-		}
+			project.configure(project) {
 
-		project.eclipse {
-			classpath {
-				file {
-					whenMerged { classpath ->
-						classpath.entries.findAll { it.path.contains('org.eclipse.jdt.launching.JRE_CONTAINER') }.each { it.path = "org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-${project.sourceCompatibility}" }
-						classpath.entries.unique()
-					}
+				if(!project.plugins.hasPlugin('eclipse')) {
+					project.apply plugin: 'eclipse'
 				}
-			}
-			jdt {
-				file {
-					withProperties { properties ->
 
-						def formatter = new XmlSlurper().parse(this.getClass().getResource('formatter.xml').toURI().toString())
+				if(!project.plugins.hasPlugin('java')) {
+					println "the project has no java plugin. do not configure."
+					return;
+				}
 
-						formatter.profile.setting.each {
-							if ((it.@id as String).startsWith('org.eclipse.jdt.core.formatter.')) {
-								properties.put(it.@id as String, it.@value as String)
+				project.eclipse {
+					classpath {
+						file {
+							whenMerged { classpath ->
+								classpath.entries.findAll {
+									it.path.contains('org.eclipse.jdt.launching.JRE_CONTAINER')
+								}.each { it.path = "org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-${project.sourceCompatibility}" }
+								classpath.entries.unique()
+							}
+						}
+					}
+					jdt {
+						file {
+							withProperties { properties ->
+
+								def formatter = new XmlSlurper().parse(this.getClass().getResource('formatter.xml').toURI().toString())
+
+								formatter.profile.setting.each {
+									if ((it.@id as String).startsWith('org.eclipse.jdt.core.formatter.')) {
+										properties.put(it.@id as String, it.@value as String)
+									}
+								}
 							}
 						}
 					}
 				}
+
+				project.eclipseJdt {
+					inputFile = new File(this.getClass().getResource('org.eclipse.jdt.core.prefs').file)
+					transformer.addAction { properties ->
+						properties.put('org.eclipse.jdt.core.compiler.codegen.targetPlatform', project.sourceCompatibility as String)
+						properties.put('org.eclipse.jdt.core.compiler.compliance', project.sourceCompatibility as String)
+						properties.put('org.eclipse.jdt.core.compiler.source', project.sourceCompatibility as String)
+					}
+				}
+
+				project.tasks.eclipseProject.doLast {
+					mergePreferences(project, 'org.eclipse.core.resources.prefs')
+					mergePreferences(project, 'org.eclipse.core.runtime.prefs')
+					mergePreferences(project, 'org.eclipse.jdt.ui.prefs')
+				}
+
+				project.tasks.withType(AbstractCompile) { task ->
+					task.options.encoding = 'UTF-8'
+				}
 			}
-		}
-
-		project.eclipseJdt {
-			inputFile = new File(this.getClass().getResource('org.eclipse.jdt.core.prefs').file)
-			transformer.addAction { properties ->
-				properties.put('org.eclipse.jdt.core.compiler.codegen.targetPlatform', project.sourceCompatibility as String)
-				properties.put('org.eclipse.jdt.core.compiler.compliance', project.sourceCompatibility as String)
-				properties.put('org.eclipse.jdt.core.compiler.source', project.sourceCompatibility as String)
-			}
-		}
-
-		project.tasks.eclipseProject.doLast {
-			mergePreferences('org.eclipse.core.resources.prefs')
-			mergePreferences('org.eclipse.core.runtime.prefs')
-			mergePreferences('org.eclipse.jdt.ui.prefs')
-		}
-
-		project.tasks.withType(AbstractCompile) { task ->
-			task.options.encoding = 'UTF-8'
 		}
 	}
 
-	private void mergePreferences(String name) {
+	private void mergePreferences(Project project, String name) {
 		File file = project.file('.settings/' + name )
 		Properties properties = new Properties()
 		if (file.exists()) {
