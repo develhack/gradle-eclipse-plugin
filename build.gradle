@@ -1,13 +1,9 @@
-defaultTasks 'clean', 'build'
-
-buildscript {
-	repositories { jcenter() }
-	dependencies { classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6' }
+plugins {
+	id 'groovy'
+	id 'maven-publish'
+	id 'eclipse'
+	id "com.jfrog.bintray" version "0.6"
 }
-
-apply plugin: 'groovy'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 
 group = 'com.develhack'
 archivesBaseName = 'gradle-eclupse-plugin'
@@ -54,8 +50,6 @@ publishing {
 
 if(hasProperty('BINTRAY_USER') && hasProperty('BINTRAY_API_KEY')) {
 
-	apply plugin: 'com.jfrog.bintray'
-
 	bintray {
 		user = "$BINTRAY_USER"
 		key = "$BINTRAY_API_KEY"
@@ -70,3 +64,5 @@ if(hasProperty('BINTRAY_USER') && hasProperty('BINTRAY_API_KEY')) {
 		}
 	}
 }
+
+defaultTasks 'clean', 'build'
