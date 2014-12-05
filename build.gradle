@@ -1,13 +1,14 @@
 plugins {
 	id 'groovy'
+	id 'maven'
 	id 'maven-publish'
 	id 'eclipse'
 	id "com.jfrog.bintray" version "0.6"
 }
 
 group = 'com.develhack'
-archivesBaseName = 'gradle-eclupse-plugin'
-version = '0.1.4'
+archivesBaseName = 'gradle-eclipse-plugin'
+version = '0.1.5'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6

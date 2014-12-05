@@ -41,26 +41,35 @@ class EclipsePlugin implements Plugin<Project> {
 						file {
 							withProperties { properties ->
 
-								def formatter = new XmlSlurper().parse(this.getClass().getResource('formatter.xml').toURI().toString())
-
-								formatter.profile.setting.each {
-									if ((it.@id as String).startsWith('org.eclipse.jdt.core.formatter.')) {
-										properties.put(it.@id as String, it.@value as String)
-									}
+								def prefs = new Properties()
+								prefs.load(this.getClass().getResourceAsStream('org.eclipse.jdt.core.prefs'))
+								prefs.entrySet().forEach {
+									properties.put(it.key, it.value)
 								}
+								//								def formatter = new XmlSlurper().parse(this.getClass().getResource('formatter.xml').toURI().toString())
+								//								formatter.profile.setting.each {
+								//									if ((it.@id as String).startsWith('org.eclipse.jdt.core.formatter.')) {
+								//										properties.put(it.@id as String, it.@value as String)
+								//									}
+								//								}
+
+								properties.put('org.eclipse.jdt.core.compiler.codegen.targetPlatform', project.sourceCompatibility as String)
+								properties.put('org.eclipse.jdt.core.compiler.compliance', project.sourceCompatibility as String)
+								properties.put('org.eclipse.jdt.core.compiler.source', project.sourceCompatibility as String)
+
 							}
 						}
 					}
 				}
-
-				project.eclipseJdt {
-					inputFile = new File(this.getClass().getResource('org.eclipse.jdt.core.prefs').file)
-					transformer.addAction { properties ->
-						properties.put('org.eclipse.jdt.core.compiler.codegen.targetPlatform', project.sourceCompatibility as String)
-						properties.put('org.eclipse.jdt.core.compiler.compliance', project.sourceCompatibility as String)
-						properties.put('org.eclipse.jdt.core.compiler.source', project.sourceCompatibility as String)
-					}
-				}
+				//
+				//				project.eclipseJdt {
+				//					inputFile = new File(this.getClass().getResource('org.eclipse.jdt.core.prefs').file)
+				//					transformer.addAction { properties ->
+				//						properties.put('org.eclipse.jdt.core.compiler.codegen.targetPlatform', project.sourceCompatibility as String)
+				//						properties.put('org.eclipse.jdt.core.compiler.compliance', project.sourceCompatibility as String)
+				//						properties.put('org.eclipse.jdt.core.compiler.source', project.sourceCompatibility as String)
+				//					}
+				//				}
 
 				project.tasks.eclipseProject.doLast {
 					mergePreferences(project, 'org.eclipse.core.resources.prefs')
