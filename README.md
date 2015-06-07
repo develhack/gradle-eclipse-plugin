@@ -1,5 +1,5 @@
 # gradle-eclipse-plugin
-Gradle plugin that contains the common settings of Develhack.com.
+Gradle plugin for eclipse that contains the common settings of Develhack.com.
 
 ## About
 This plugin is wrapper around the standard eclipse plugin of gralde.
